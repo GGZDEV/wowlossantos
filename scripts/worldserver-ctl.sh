@@ -14,6 +14,15 @@ pidfile="$root/local/worldserver.pid"
 
 case "${1:-}" in
   start)
+    # MySQL is often not auto-started (WSL, containers).
+    if ! mysqladmin ping >/dev/null 2>&1 && ! sudo -n mysqladmin ping >/dev/null 2>&1; then
+      echo "starting mysql..."
+      $([ "$EUID" -ne 0 ] && echo sudo) service mysql start >/dev/null
+      for _ in $(seq 1 30); do mysqladmin ping >/dev/null 2>&1 || sudo -n mysqladmin ping >/dev/null 2>&1 && break; sleep 1; done
+    fi
+    if [[ -z "${ATA_BRIDGE_TOKEN:-}" && -s "$root/local/bridge.token" ]]; then
+      export ATA_BRIDGE_TOKEN="$(cat "$root/local/bridge.token")"
+    fi
     mkdir -p "$(dirname "$out")"
     [[ -p "$fifo" ]] || mkfifo "$fifo"
     if [[ -f "$pidfile" ]] && kill -0 "$(cat "$pidfile")" 2>/dev/null; then
