@@ -34,6 +34,8 @@ public:
     virtual void deletePed(int handle) = 0;
     // Absolute state only: sets the ped's health/max health fields.
     virtual void setPedHealth(int handle, float hp, float maxHp) = 0;
+    // Health read back from the game after mirroring (evidence: core HP == GTA HP). -1 = unknown.
+    virtual float pedHealth(int /*handle*/) { return -1.0f; }
     virtual void presentDeath(int handle) = 0;
     // Scope native GTA damage away from bridge entities (bullet/fire/explosion/collision/melee proofs).
     virtual void setPedProofs(int handle, bool on) = 0;

@@ -7,9 +7,11 @@ Ce qui est déjà prouvé sans GTA : `docs/evidence/m0-m1-report.md`. Ce qui res
 
 ## Prérequis
 
-- PC Windows 10/11 avec **GTA San Andreas PC, exécutable 1.0 US** (le plugin utilise les adresses
-  1.0 US de Plugin-SDK). Les versions Steam/Rockstar Launcher récentes et la Definitive Edition ne sont
-  **pas** supportées : utiliser un downgrader vers 1.0 US sur une copie du jeu.
+- PC Windows 10/11 avec **GTA San Andreas – The Definitive Edition** (PC, Steam/Rockstar/Epic, `SanAndreas.exe`
+  64 bits) → plugin `dist/gta-sa/de/`.
+  (La version classique 1.0 US reste supportée → `dist/gta-sa/classic/`.)
+- Le support DE de Plugin-SDK est **expérimental** : les fonctions du jeu sont retrouvées par signature binaire,
+  ce qui survit en général aux mises à jour mais n'a pas encore été vérifié sur ta version du jeu.
 - WSL2 avec Ubuntu 24.04 (`wsl --install -d Ubuntu-24.04` dans PowerShell admin, puis redémarrer).
 - ~25 Go libres dans WSL, 8 Go de RAM conseillés.
 
@@ -57,38 +59,53 @@ Test-NetConnection 127.0.0.1 -Port 17635    # TcpTestSucceeded : True
 
 (Sur Windows 10, la redirection localhost par défaut de WSL2 suffit en général ; même vérification.)
 
-## Étape 4 — installer le plugin dans GTA
+## Étape 4 — installer le plugin dans GTA SA Definitive Edition
 
-1. Sauvegarder le dossier GTA.
-2. Si aucun ASI loader n'est installé : Ultimate ASI Loader **v9.7.4 x86**
-   (https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases/tag/v9.7.4), copier son `dinput8.dll`
-   (ou le nom que sa doc recommande pour GTA SA) à côté de `gta_sa.exe`. Ne pas écraser un DLL existant.
-3. Copier `dist/gta-sa/AzerothTheftAuto.asi` et `dist/gta-sa/AzerothTheftAuto.ini` dans le dossier
-   de GTA (ou `scripts\` si ton loader l'utilise). Récupérer les fichiers depuis Windows via
-   `\\wsl$\Ubuntu-24.04\home\<user>\wowlossantos\dist\gta-sa\` (SHA-256 dans `AzerothTheftAuto.asi.sha256`).
-4. Créer `AzerothTheftAuto.token` au même endroit, contenant uniquement le token
+1. Trouver le dossier qui contient **`SanAndreas.exe`** (en général `…\Gameface\Binaries\Win64\`).
+   Faire une copie de sauvegarde de ce dossier.
+2. ASI loader 64 bits : télécharger
+   https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases/download/x64-latest/dinput8-x64.zip et mettre
+   `dinput8.dll` à côté de `SanAndreas.exe` (ne pas écraser un fichier existant ; si rien ne se charge,
+   renommer en `version.dll` ou `winmm.dll`, cf. README du loader).
+3. Copier `dist/gta-sa/de/AzerothTheftAuto.asi` et `dist/gta-sa/de/AzerothTheftAuto.ini` dans le même dossier
+   (ou un sous-dossier `scripts\` / `plugins\`). Depuis Windows :
+   `\\wsl$\Ubuntu-24.04\home\<user>\wowlossantos\dist\gta-sa\de\` (SHA-256 dans `AzerothTheftAuto.asi.sha256`).
+4. Créer `AzerothTheftAuto.token` au même endroit que le `.asi`, contenant uniquement le token
    (`cat ~/wowlossantos/local/bridge.token`).
+5. Lancer le jeu une fois : un fichier **`AzerothTheftAuto.log`** doit apparaître à côté du `.asi`
+   (sinon dans `%TEMP%`) avec « adapter loaded for GTA SA Definitive Edition (x64) ».
+
+(Version classique 1.0 US : même chose avec `dist/gta-sa/classic/`, l'ASI loader **x86** et `gta_sa.exe`.)
 
 ## Étape 5 — le test
 
-1. Serveur démarré (étape 2). Lancer GTA, charger une sauvegarde.
-2. Aller à **Grove Street devant la maison de CJ** (≈ 2495, −1670) — zone de l'arène.
-3. **F9** → un ped apparaît ~14 m à l'ouest de CJ, overlay « TEST ACTIVE » en haut à gauche.
-4. **1** → après 1,5 s l'overlay affiche `target hp (core): 3x` et le ped a exactement ces PV.
-5. Rappuyer **1** jusqu'à la mort du ped (animation de mort une seule fois). **F8** = nouveau loup.
-6. **F9** = sortir du mode test.
+En DE il n'y a **pas d'overlay à l'écran** (l'outil de texte de Plugin-SDK ne supporte pas DE) : on suit le log.
+Dans PowerShell, à côté du jeu :
 
-Ce qu'il faut me renvoyer : `AzerothTheftAuto.log` (à côté du .asi, sinon `%TEMP%`),
-`~/wowlossantos/local/logs/core/Server.log`, et ce que tu as vu à l'écran. Checklist complète :
-`docs/evidence/m1-gta-checklist.md`.
+```powershell
+Get-Content .\AzerothTheftAuto.log -Wait -Tail 20
+```
+
+1. Serveur démarré (étape 2). Lancer GTA SA DE, charger une sauvegarde.
+2. Aller à **Grove Street devant la maison de CJ** (≈ 2495, −1670) — zone de l'arène.
+3. **F9** → log `WELCOME …` puis `bound target-1 …` ; un ped apparaît ~14 m à l'ouest de CJ.
+4. Se tourner vers le ped, **1** → log `CAST_STATUS cast-n accepted` puis `completed`, puis
+   `MIRROR target-1 core hp 3x/55 -> gta ped health 3x` : les deux nombres doivent être identiques.
+5. Rappuyer **1** jusqu'à la mort du ped (`death presented once`, animation de mort une seule fois). **F8** = nouveau loup.
+6. **F9** = sortir du mode test (le ped disparaît, CJ redevient vulnérable).
+
+Ce qu'il faut me renvoyer : `AzerothTheftAuto.log`, `~/wowlossantos/local/logs/core/Server.log`,
+la version du jeu (propriétés de `SanAndreas.exe`) et ce que tu as vu à l'écran.
+Checklist complète : `docs/evidence/m1-gta-checklist.md`.
 
 ## Si ça coince
 
 | Symptôme | Cause probable |
 |---|---|
-| Pas de `AzerothTheftAuto.log` | ASI loader absent/mauvais nom, ou mauvaise version de `gta_sa.exe` |
+| Pas de `AzerothTheftAuto.log` | ASI loader absent / mauvais nom (essayer `version.dll`, `winmm.dll`), ou mauvais build (x64 pour DE) |
+| Message d'erreur Plugin-SDK au lancement (« pattern » / « address ») | ta version de DE n'est pas reconnue par le SDK : m'envoyer la version exacte |
 | Log « no bridge token » | fichier `.token` absent / vide |
-| Overlay « offline » / log « connecting » en boucle | serveur arrêté ou réseau WSL (étape 3) |
+| Log « core connection closed » en boucle | serveur arrêté ou réseau WSL (étape 3) |
 | ERROR `outside_arena` | CJ trop loin de Grove Street (rayon ~36 m) |
 | ERROR `unauthorized` | token différent entre GTA et le serveur |
 | `SPELL_FAILED_UNIT_NOT_INFRONT` | CJ ne regarde pas le ped (tourne-toi vers lui) |

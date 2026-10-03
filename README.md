@@ -35,8 +35,8 @@ Le premier succès attendu : **appuyer sur une touche dans GTA → sort validé 
 
 | Élément | Choix |
 |---|---|
-| Jeu hôte | GTA SA PC classique, cible initiale 1.0 US x86 à identifier sur la machine |
-| Adapter | C++ / Plugin-SDK / plugin ASI 32 bits |
+| Jeu hôte | GTA SA The Definitive Edition (x64) ; GTA SA classique 1.0 US (x86) aussi supporté |
+| Adapter | C++ / Plugin-SDK / plugin ASI (x64 pour DE, x86 pour le classique) |
 | Gameplay | AzerothCore officiel 3.3.5a, module compilé dans worldserver |
 | Serveur initial | Windows x64 sur le même PC ; autre OS possible plus tard |
 | Transport initial | TCP sur 127.0.0.1, JSON encadré ; pas d'accès distant |

@@ -430,6 +430,11 @@ void AdapterCore::handleSnapshot(Envelope const& env)
         if (b.handle && _game.pedExists(b.handle))
         {
             _game.setPedHealth(b.handle, hp, maxHp);
+            char mirror[160];
+            std::snprintf(mirror, sizeof(mirror), "MIRROR %s core hp %.0f/%.0f -> gta ped health %.0f (rev %lld)",
+                          id.c_str(), hp, maxHp, _game.pedHealth(b.handle),
+                          static_cast<long long>(e.find("revision")->asInt()));
+            log(mirror);
             if (b.dead && !b.deathPresented)
             {
                 b.deathPresented = true;

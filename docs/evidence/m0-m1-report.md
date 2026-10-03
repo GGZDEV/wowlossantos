@@ -20,7 +20,8 @@ Separately, as requested:
 
 - **Implemented:** protocol library, `bridge-cli`, `mod-gamebridge`, GTA adapter (`AdapterCore` + Plugin-SDK seam), scripts, docs.
 - **Compiled:** worldserver with module (x86_64 Linux, GCC 13); protocol/tests/cli (x64 Linux; x86 Windows mingw); `AzerothTheftAuto.asi` (x86, clang 18 → i686-w64-mingw32, Plugin-SDK `15f15b60`). MSVC build not run.
-- **Automated tests passed:** `protocol_tests` 38/38, `adapter_tests` 5/5 (x64 native, and x86 `.exe` under wine 9.0 — wine is not a real Windows).
+- **Automated tests passed:** `protocol_tests` 38/38, `adapter_tests` 5/5 — x64 Linux, x86 Windows `.exe` and x64 Windows `.exe` under wine 9.0 (wine is not a real Windows).
+- **GTA SA Definitive Edition:** adapter rebuilt on the Plugin-SDK `GTASA_UNREAL` target (x64); compiled and linked, never loaded in the game. No on-screen overlay on DE (SDK font helper is classic-only); evidence is the `MIRROR` log line (core HP vs `GET_CHAR_HEALTH`).
 - **Native core integration passed:** yes (§3), against the real worldserver, real DB, real data.
 - **GTA manual test:** pending.
 
@@ -102,7 +103,8 @@ scripts/rebuild-worldserver.sh          # incremental module rebuild + stripped 
 | module config | `local/azeroth-server/etc/modules/mod_gamebridge.conf` |
 | bridge token (secret, not in git) | `local/bridge.token` → exported as `ATA_BRIDGE_TOKEN` |
 | bridge-cli | `build/protocol-x64/bridge-cli`, `build/protocol-x86-win/bridge-cli.exe` |
-| GTA adapter | `build/gta-win32/bin/Release/AzerothTheftAuto.asi` (PE32 i386 DLL; imports KERNEL32, msvcrt, USER32, WS2_32) |
+| GTA adapter, Definitive Edition | `build/gta/bin/DE/Release/AzerothTheftAuto.asi` (PE32+ x86-64 DLL), copy in `dist/gta-sa/de/` |
+| GTA adapter, classic 1.0 US | `build/gta/bin/Classic/Release/AzerothTheftAuto.asi` (PE32 i386 DLL), copy in `dist/gta-sa/classic/` |
 | core logs | `local/logs/core/Server.log`, console `local/logs/worldserver.out` |
 | adapter log | `AzerothTheftAuto.log` next to the ASI or `%TEMP%` |
 

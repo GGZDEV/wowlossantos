@@ -1,36 +1,50 @@
-// Azeroth Theft Auto - GTA San Andreas ASI entry point (Plugin-SDK, Win32, GTA SA 1.0 US).
+// Azeroth Theft Auto - GTA San Andreas ASI entry point (Plugin-SDK).
 //
-// Everything engine-related lives here; AdapterCore holds the bridge logic.
-// The static object below only registers Plugin-SDK events: no thread, socket,
-// file or game object is created during DllMain. The network client starts on
-// Events::initGameEvent and is driven from Events::gameProcessEvent (game thread).
+// One source, two builds:
+//   - GTASA          : classic GTA SA 1.0 US, Win32 .asi
+//   - GTASA_UNREAL   : GTA SA The Definitive Edition, x64 .asi (Plugin-SDK "unreal" target;
+//                      functions located by binary patterns, not fixed addresses)
+//
+// Engine access goes through the game's own script interpreter (Plugin-SDK
+// Command<...>), which exists identically in both versions: no hand-written offsets.
+// The static object only registers Plugin-SDK events (DllMain context). Config,
+// log and network client are created lazily on the first gameProcessEvent, and all
+// game calls happen on the game thread inside that event.
 #include "plugin.h"
 
 #include "AdapterCore.h"
 
-#include "CMenuManager.h"
-#include "CPed.h"
 #include "CPools.h"
-#include "CTimer.h"
-#include "common.h"
-#include "extensions/FontPrint.h"
 #include "extensions/Paths.h"
 #include "extensions/ScriptCommands.h"
+#ifdef GTASA
+#include "CMenuManager.h"
+#include "CPed.h"
+#include "common.h"
+#include "extensions/FontPrint.h"
+#endif
 
 #include <windows.h>
 
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
 #include <map>
+#include <memory>
 #include <mutex>
-#include <sstream>
 #include <string>
 
 using namespace plugin;
 
 namespace {
+
+#ifdef GTASA_UNREAL
+constexpr char const* kBuild = "GTA SA Definitive Edition (x64)";
+#else
+constexpr char const* kBuild = "GTA SA 1.0 US (x86)";
+#endif
 
 // ---------------------------------------------------------------- logging
 
@@ -85,6 +99,15 @@ struct IniValues
     }
 };
 
+std::string trim(std::string s)
+{
+    while (!s.empty() && (s.back() == ' ' || s.back() == '\r' || s.back() == '\n' || s.back() == '\t'))
+        s.pop_back();
+    while (!s.empty() && (s.front() == ' ' || s.front() == '\t'))
+        s.erase(s.begin());
+    return s;
+}
+
 IniValues readIni(std::string const& path)
 {
     IniValues v;
@@ -95,14 +118,8 @@ IniValues readIni(std::string const& path)
         if (line.empty() || line[0] == ';' || line[0] == '#' || line[0] == '[')
             continue;
         auto eq = line.find('=');
-        if (eq == std::string::npos)
-            continue;
-        auto trim = [](std::string s) {
-            while (!s.empty() && (s.back() == ' ' || s.back() == '\r' || s.back() == '\t')) s.pop_back();
-            while (!s.empty() && (s.front() == ' ' || s.front() == '\t')) s.erase(s.begin());
-            return s;
-        };
-        v.kv[trim(line.substr(0, eq))] = trim(line.substr(eq + 1));
+        if (eq != std::string::npos)
+            v.kv[trim(line.substr(0, eq))] = trim(line.substr(eq + 1));
     }
     return v;
 }
@@ -112,24 +129,35 @@ std::string readTokenFile(std::string const& path)
     std::ifstream in(path);
     std::string t;
     std::getline(in, t);
-    while (!t.empty() && (t.back() == '\r' || t.back() == ' '))
-        t.pop_back();
-    return t;
+    return trim(t);
 }
 
-// ---------------------------------------------------------------- engine seam
+// ---------------------------------------------------------------- engine seam (script commands)
 
-class SdkGameApi : public ata::GameApi
+int playerHandle()
+{
+    if (!Command<Commands::IS_PLAYER_PLAYING>(0))   // no player ped yet (menus/loading/wasted)
+        return 0;
+    int h = 0;
+    Command<Commands::GET_PLAYER_CHAR>(0, &h);
+    return h;
+}
+
+class ScriptGameApi : public ata::GameApi
 {
 public:
-    bool playerPosition(ata::Vec3& pos, float& heading) override
+    bool playerPosition(ata::Vec3& pos, float& headingRad) override
     {
-        CPed* p = FindPlayerPed();
-        if (!p)
+        int h = playerHandle();
+        if (!h || !Command<Commands::DOES_CHAR_EXIST>(h))
             return false;
-        CVector const& v = p->GetPosition();
-        pos = { v.x, v.y, v.z };
-        heading = p->GetHeading();
+        float x = 0, y = 0, z = 0, deg = 0;
+        Command<Commands::GET_CHAR_COORDINATES>(h, &x, &y, &z);
+        Command<Commands::GET_CHAR_HEADING>(h, &deg);   // script headings are degrees, 0 = north, CCW
+        if (!std::isfinite(x) || !std::isfinite(y) || !std::isfinite(z) || !std::isfinite(deg))
+            return false;
+        pos = { x, y, z };
+        headingRad = deg * 0.0174532925f;
         return true;
     }
 
@@ -144,17 +172,17 @@ public:
         int handle = 0;
         Command<Commands::CREATE_CHAR>(4 /* PED_TYPE_CIVMALE */, modelId, pos.x, pos.y, groundZ, &handle);
         Command<Commands::MARK_MODEL_AS_NO_LONGER_NEEDED>(modelId);
-        if (!handle || !CPools::GetPed(handle))
+        if (!handle || !Command<Commands::DOES_CHAR_EXIST>(handle))
             return 0;
-        Command<Commands::SET_CHAR_HEADING>(handle, headingRad * 57.2957795f);   // script headings are degrees
-        Command<Commands::SET_CHAR_STAY_IN_SAME_PLACE>(handle, 1);               // stationary fixture
+        Command<Commands::SET_CHAR_HEADING>(handle, headingRad * 57.2957795f);
+        Command<Commands::SET_CHAR_STAY_IN_SAME_PLACE>(handle, 1);   // stationary fixture
         return handle;
     }
 
     bool pedExists(int handle) override
     {
-        // CPools::GetPed validates the slot's generation byte embedded in the handle.
-        return handle && CPools::GetPed(handle) != nullptr;
+        // Script handles embed the pool slot generation; DOES_CHAR_EXIST rejects recycled slots.
+        return handle && Command<Commands::DOES_CHAR_EXIST>(handle);
     }
 
     void deletePed(int handle) override
@@ -165,11 +193,19 @@ public:
 
     void setPedHealth(int handle, float hp, float maxHp) override
     {
-        if (CPed* ped = CPools::GetPed(handle))
-        {
-            ped->m_fMaxHealth = maxHp;
-            ped->m_fHealth = hp;
-        }
+        if (!pedExists(handle))
+            return;
+        Command<Commands::SET_CHAR_MAX_HEALTH>(handle, static_cast<int>(maxHp));
+        Command<Commands::SET_CHAR_HEALTH>(handle, static_cast<int>(hp));
+    }
+
+    float pedHealth(int handle) override
+    {
+        if (!pedExists(handle))
+            return -1.0f;
+        int hp = -1;
+        Command<Commands::GET_CHAR_HEALTH>(handle, &hp);
+        return static_cast<float>(hp);
     }
 
     void presentDeath(int handle) override
@@ -189,37 +225,39 @@ public:
 
     void setPlayerProofs(bool on) override
     {
-        CPed* p = FindPlayerPed();
-        if (!p)
+        int h = playerHandle();
+        if (!h)
             return;
-        if (on && !_playerProofsSaved)
+        if (on && !_active)
         {
-            _saved = { p->bBulletProof, p->bFireProof, p->bExplosionProof,
-                       p->bCollisionProof, p->bMeleeProof };
-            _playerProofsSaved = true;
-            int h = CPools::GetPedRef(p);
+#ifdef GTASA
+            // Classic: remember CJ's current proofs (CPhysical bits, VALIDATE_OFFSET'd in the SDK).
+            if (CPed* p = CPools::GetPed(h))
+                _saved = { p->bBulletProof, p->bFireProof, p->bExplosionProof, p->bCollisionProof, p->bMeleeProof };
+#endif
             Command<Commands::SET_CHAR_PROOFS>(h, 1, 1, 1, 1, 1);
+            _active = true;
         }
-        else if (!on && _playerProofsSaved)
+        else if (!on && _active)
         {
-            int h = CPools::GetPedRef(p);
+            // DE: the SDK exposes no CPed fields, so CJ's proofs return to the game default (off).
             Command<Commands::SET_CHAR_PROOFS>(h, int(_saved.bullet), int(_saved.fire), int(_saved.explosion),
                                                int(_saved.collision), int(_saved.melee));
-            _playerProofsSaved = false;
+            _active = false;
         }
     }
 
-    void forgetPlayerProofs() { _playerProofsSaved = false; }   // new game: CJ is a different ped
+    void forgetPlayerProofs() { _active = false; _saved = {}; }
 
     void log(std::string const& line) override { g_log.write(line); }
 
 private:
     struct Proofs
     {
-        bool bullet, fire, explosion, collision, melee;
+        bool bullet = false, fire = false, explosion = false, collision = false, melee = false;
     };
     Proofs _saved {};
-    bool _playerProofsSaved = false;
+    bool _active = false;
 };
 
 // ---------------------------------------------------------------- plugin
@@ -230,14 +268,11 @@ public:
     AzerothTheftAuto()
     {
         // DllMain context: register callbacks only.
-        Events::initGameEvent += [this] { init(); };
         Events::gameProcessEvent += [this] { process(); };
+#ifdef GTASA
         Events::drawingEvent += [this] { draw(); };
-        Events::restartGameEvent += [this] {
-            _game.forgetPlayerProofs();
-            if (_core)
-                _core->onGameRestart();
-        };
+        Events::restartGameEvent += [this] { restart("restartGameEvent"); };
+#endif
         Events::shutdownRwEvent += [this] {
             if (_core)
                 _core->stop();
@@ -247,8 +282,7 @@ public:
 private:
     void init()
     {
-        if (_core)
-            return;
+        _initDone = true;
         g_log.open();
         IniValues ini = readIni(std::string(paths::GetPluginDirPathA()) + "AzerothTheftAuto.ini");
         ata::AdapterConfig cfg;
@@ -259,10 +293,10 @@ private:
         _keyReset = static_cast<unsigned>(std::strtoul(ini.get("KeyReset", "0x77").c_str(), nullptr, 0));     // VK_F8
         _keyCast = static_cast<unsigned>(std::strtoul(ini.get("KeyCast", "0x31").c_str(), nullptr, 0));       // '1'
         if (char const* env = std::getenv("ATA_BRIDGE_TOKEN"))
-            cfg.token = env;
+            cfg.token = trim(env);
         else
             cfg.token = readTokenFile(std::string(paths::GetPluginDirPathA()) + ini.get("TokenFile", "AzerothTheftAuto.token"));
-        g_log.write("Azeroth Theft Auto adapter loading; log at " + g_log.path());
+        g_log.write(std::string("Azeroth Theft Auto adapter loaded for ") + kBuild + "; log at " + g_log.path());
         if (cfg.token.size() < 16)
         {
             g_log.write("no bridge token (ATA_BRIDGE_TOKEN or token file); adapter stays offline, game unaffected");
@@ -270,6 +304,16 @@ private:
         }
         _core = std::make_unique<ata::AdapterCore>(cfg, _game);
         _core->start();
+    }
+
+    void restart(char const* why)
+    {
+        _game.forgetPlayerProofs();
+        if (_core)
+        {
+            g_log.write(std::string("game restart detected (") + why + ")");
+            _core->onGameRestart();
+        }
     }
 
     bool edge(unsigned key, bool& prev)
@@ -282,10 +326,38 @@ private:
 
     void process()
     {
+        if (!_initDone)
+            init();
         if (!_core)
             return;
+
+        ULONGLONG wall = GetTickCount64();
+        int gameTimer = 0;
+        Command<Commands::GET_GAME_TIMER>(&gameTimer);
+        int player = playerHandle();
+
+#ifdef GTASA_UNREAL
+        // DE has no restartGameEvent in the SDK: a new game/load recreates CJ or rewinds the game clock.
+        if (_lastPlayer && player && player != _lastPlayer)
+            restart("player handle changed");
+        else if (_lastGameTimer && gameTimer + 2000 < _lastGameTimer)
+            restart("game clock went backwards");
+#endif
+        _lastPlayer = player;
+
+        // Paused / menus / loading: the game clock stops while frames may continue.
+        if (gameTimer != _lastGameTimer)
+        {
+            _lastGameTimer = gameTimer;
+            _lastClockMove = wall;
+        }
+        bool stalled = wall - _lastClockMove > 300;
+
         ata::FrameInput in;
-        in.menuOrLoading = FrontEndMenuManager.m_bMenuActive || CTimer::m_UserPause || CTimer::m_CodePause;
+        in.menuOrLoading = stalled || !player;
+#ifdef GTASA
+        in.menuOrLoading = in.menuOrLoading || FrontEndMenuManager.m_bMenuActive;
+#endif
         bool t = edge(_keyToggle, _prevToggle), r = edge(_keyReset, _prevReset), c = edge(_keyCast, _prevCast);
         if (!in.menuOrLoading)
         {
@@ -293,20 +365,26 @@ private:
             in.resetFixture = r;
             in.cast = c;
         }
-        _core->onFrame(CTimer::m_snTimeInMillisecondsNonClipped, in);
+        _core->onFrame(static_cast<std::uint64_t>(wall), in);
     }
 
+#ifdef GTASA
     void draw()
     {
         if (!_core || !_core->testMode())
             return;
         gamefont::Print(_core->overlay(), 20.0f, 220.0f, 1.0f, FONT_DEFAULT, 0.6f, 1.2f, CRGBA(255, 255, 255, 255));
     }
+#endif
 
-    SdkGameApi _game;
+    ScriptGameApi _game;
     std::unique_ptr<ata::AdapterCore> _core;
+    bool _initDone = false;
     unsigned _keyToggle = 0x78, _keyReset = 0x77, _keyCast = 0x31;
     bool _prevToggle = false, _prevReset = false, _prevCast = false;
+    int _lastPlayer = 0;
+    int _lastGameTimer = 0;
+    ULONGLONG _lastClockMove = 0;
 } g_plugin;
 
 } // namespace
