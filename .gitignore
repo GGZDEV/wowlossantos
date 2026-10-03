@@ -1,0 +1,8 @@
+*.dmp
+*.log
+*.token
+*.user
+build/
+config/bridge.local.json
+local/
+vendor/

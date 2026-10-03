@@ -1,0 +1,9 @@
+Read CLAUDE.md and every document listed under Required reading. This directory is a specification starter, not an implemented mod.
+
+Implement Milestone 0, then Milestone 1 when its prerequisites are proven. Use the official AzerothCore 3.3.5a core first. Preserve the goal: actual native WoW-server spell execution driving GTA San Andreas entities. Do not substitute a custom damage engine or a mock and call it success.
+
+Inspect my machine and the checked-out source before selecting APIs, toolchains or dependency versions. Read applicable upstream AGENTS.md and CLAUDE.md. Clone the dependencies, record exact SHAs, build reproducibly, and implement the smallest module/patch and x86 ASI adapter needed. Audit the headless Player/WorldSession lifecycle and proxy-map requirements before writing a large bridge.
+
+Continue autonomously through reversible development work. If a prerequisite needs me, finish independent work and give exact local steps. Do not invent API names or silently weaken the acceptance criteria. Report separately: implemented, compiled, automated tests passed, native core integration passed, GTA manual test pending/passed.
+
+Stop after Milestone 1 evidence is complete and report the outcome. No CoA integration, custom models, talents, full HUD or shared-memory optimization yet.

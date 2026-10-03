@@ -1,0 +1,49 @@
+{
+  "status": "pinned for Milestone 0/1 evidence (see docs/evidence/m0-audit.md)",
+  "resolved_on": "2026-10-02",
+  "dependencies": [
+    {
+      "name": "azerothcore",
+      "url": "https://github.com/azerothcore/azerothcore-wotlk.git",
+      "sha": "950684036946011c3d597382b3cfb5de99f7adbc",
+      "branch": "master",
+      "commit_date": "2026-10-02T14:53:38Z",
+      "role": "baseline server; mod-gamebridge built in via modules/ (static); no core patch",
+      "notes": "Requires the upstream headless-session support from 92fed92eaa34ac3519cb454d501883d312793a18 (2026-09-23) or later"
+    },
+    {
+      "name": "azerothcore-client-data",
+      "url": "https://github.com/wowgaming/client-data/releases/download/v20.0/data.zip",
+      "version": "v20.0",
+      "sha256": "a3d4df635ae6c2c8f08052c32a79e0f806955150ad36b014a823dd08a32a4610",
+      "role": "dbc/maps/vmaps/mmaps/Cameras for worldserver; the version the pinned installer (apps/installer) downloads",
+      "notes": "client-derived data; never committed to this repository"
+    },
+    {
+      "name": "plugin-sdk",
+      "url": "https://github.com/DK22Pac/plugin-sdk.git",
+      "sha": "15f15b60bbf74c106e1b496ff92c98764abf4605",
+      "commit_date": "2026-09-08",
+      "role": "GTA SA adapter SDK (plugin_sa, GTA SA 1.0 US addresses)"
+    },
+    {
+      "name": "ultimate-asi-loader",
+      "url": "https://github.com/ThirteenAG/Ultimate-ASI-Loader",
+      "tag": "v9.7.4",
+      "sha": "6b440669144c4a0bef5718ab155df160d231cd42",
+      "role": "x86 ASI loader candidate; proxy DLL name must be chosen on the target install after checking existing loaders"
+    },
+    {
+      "name": "coa-candidate",
+      "url": "https://github.com/jealous-sound/azerothcore-wotlk-coa.git",
+      "sha": null,
+      "observed_head": "559e0214e85f633825b5f0c38af1585ed524b21a",
+      "role": "future provider after M1; not cloned, not audited, not a dependency"
+    }
+  ],
+  "toolchains_used_for_evidence": {
+    "core": "Ubuntu 24.04, GCC 13.3.0, CMake 3.28.3, MySQL 8.0.46, Boost 1.83 (x86_64 Linux; Windows x64 build not yet performed)",
+    "protocol_and_tests": "GCC 13.3.0 x86_64 (C++17)",
+    "gta_adapter": "clang 18.1.3 --target=i686-w64-mingw32 with mingw-w64 13 (Plugin-SDK linux-clang workflow, premake5 from the pinned SDK); MSVC workflow documented but not run"
+  }
+}

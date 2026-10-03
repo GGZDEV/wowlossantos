@@ -1,0 +1,36 @@
+{
+  "note": "Design example; fields require implementation and calibration. Not a working core configuration.",
+  "protocol_version": 1,
+  "transport": {
+    "bind": "127.0.0.1",
+    "port": 17635,
+    "max_frame_bytes": 65536,
+    "heartbeat_ms": 1000,
+    "heartbeat_timeout_ms": 3000
+  },
+  "token_env": "ATA_BRIDGE_TOKEN",
+  "fixture": {
+    "character_id": null,
+    "spell_id": null,
+    "creature_entry": null,
+    "proxy_map_id": null
+  },
+  "projection": {
+    "gta_origin": null,
+    "core_origin": null,
+    "scale": null,
+    "rotation": null,
+    "arena_bounds": null
+  },
+  "host": {
+    "supported_binary": "GTA SA classic 1.0 US x86; verify on target",
+    "debug_toggle": "F9",
+    "fixture_reset": "F8",
+    "cast": "1"
+  },
+  "publication": {
+    "positions_hz": 20,
+    "state_max_hz": 10,
+    "full_snapshot_hz": 1
+  }
+}

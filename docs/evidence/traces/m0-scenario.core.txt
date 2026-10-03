@@ -1,0 +1,125 @@
+> mod_gamebridge.conf
+bridge account GTABRIDGE id 1
+loading character 0x0000000000000001 through native login path (no client)
+headless player Gtabridge (0x0000000000000001) in world: map 1 (16226.20, 16257.00, 13.20) level 1 hp 52/52 power 165/165
+loaded state: xp 106 auras 7 (frost armor 168: yes)
+fixture spell 133 learned/active: yes
+fixture spell 168 learned/active: yes
+fixture spell 116 learned/active: NO
+host accepted, epoch e1-41366aca0d93be57 adapter=bridge-cli
+WELCOME sent, epoch e1-41366aca0d93be57
+fixture creature 0xF1300000450002E2 entry 69 'Diseased Timber Wolf' level 2 hp 55/55 at (16225.01, 16271.95, 12.98), 12.6 yd from player
+bound player-1 -> 0x0000000000000001 gen 1 core (16226.20, 16257.00, 13.20) host (2495.00, -1670.00, 13.30)
+bound target-1 -> 0xF1300000450002E2 gen 2 core (16225.01, 16271.95, 12.98) host (2481.33, -1671.09, 13.10)
+state rev 1: player-1 hp 52/52 alive 1 mana 165/165 casting 0
+state rev 1: target-1 hp 55/55 alive 1 mana 0/0 casting 0
+CAST_REQUEST cast-2 -> native HandleCastSpellOpcode(castCount 1, spell 133, target 0xF1300000450002E2) target hp 55/55 caster power 165
+native Spell::prepare accepted cast-2 (spell 133) [hook thread 42957, world thread 42957]
+state rev 2: player-1 hp 52/52 alive 1 mana 165/165 casting 133
+CAST_REQUEST cast-3 -> native HandleCastSpellOpcode(castCount 2, spell 133, target 0xF1300000450002E2) target hp 55/55 caster power 165
+native cast result for cast-3: SPELL_FAILED_SPELL_IN_PROGRESS (rejected)
+native Spell::cast executed cast-2 (spell 133); caster power now 157 [hook thread 8016, world thread 42957]
+state rev 3: player-1 hp 52/52 alive 1 mana 157/165 casting 0
+native damage log: spell 133 0x0000000000000001 -> 0xF1300000450002E2 amount 17 school 4 crit false [hook thread 8016]
+state rev 4: target-1 hp 38/55 alive 1 mana 0/0 casting 0
+CAST_REQUEST cast-4 -> native HandleCastSpellOpcode(castCount 3, spell 168, target 0xF1300000450002E2) target hp 38/55 caster power 157
+native Spell::cast executed cast-4 (spell 168); caster power now 133 [hook thread 42957, world thread 42957]
+state rev 5: player-1 hp 52/52 alive 1 mana 133/165 casting 0
+CAST_REQUEST cast-5 -> native HandleCastSpellOpcode(castCount 4, spell 133, target 0xF1300000450002E2) target hp 38/55 caster power 133
+native cast result for cast-5: SPELL_FAILED_NOT_READY (rejected)
+state rev 6: target-1 hp 37/55 alive 1 mana 0/0 casting 0
+CAST_REQUEST cast-6 -> native HandleCastSpellOpcode(castCount 5, spell 116, target 0xF1300000450002E2) target hp 37/55 caster power 133
+CAST_REQUEST cast-6 ignored by native handler (not in spellbook/passive?)
+CAST_REQUEST cast-7 spell 133 rejected by bridge validation: unknown_target
+state rev 7: target-1 hp 36/55 alive 1 mana 0/0 casting 0
+CAST_REQUEST cast-8 -> native HandleCastSpellOpcode(castCount 6, spell 133, target 0xF1300000450002E2) target hp 36/55 caster power 133
+native cast result for cast-8: SPELL_FAILED_UNIT_NOT_INFRONT (rejected)
+state rev 8: player-1 hp 52/52 alive 1 mana 134/165 casting 0
+state rev 9: player-1 hp 52/52 alive 1 mana 135/165 casting 0
+state rev 10: player-1 hp 52/52 alive 1 mana 137/165 casting 0
+state rev 11: player-1 hp 52/52 alive 1 mana 138/165 casting 0
+state rev 12: player-1 hp 52/52 alive 1 mana 139/165 casting 0
+state rev 13: player-1 hp 52/52 alive 1 mana 141/165 casting 0
+state rev 14: player-1 hp 52/52 alive 1 mana 142/165 casting 0
+state rev 15: player-1 hp 52/52 alive 1 mana 143/165 casting 0
+state rev 16: player-1 hp 52/52 alive 1 mana 144/165 casting 0
+state rev 17: player-1 hp 52/52 alive 1 mana 146/165 casting 0
+state rev 18: player-1 hp 52/52 alive 1 mana 147/165 casting 0
+state rev 19: player-1 hp 52/52 alive 1 mana 149/165 casting 0
+state rev 20: player-1 hp 52/52 alive 1 mana 150/165 casting 0
+state rev 21: player-1 hp 52/52 alive 1 mana 151/165 casting 0
+state rev 22: player-1 hp 52/52 alive 1 mana 153/165 casting 0
+state rev 23: player-1 hp 52/52 alive 1 mana 154/165 casting 0
+state rev 24: player-1 hp 52/52 alive 1 mana 155/165 casting 0
+state rev 25: player-1 hp 52/52 alive 1 mana 157/165 casting 0
+state rev 26: player-1 hp 52/52 alive 1 mana 158/165 casting 0
+state rev 27: player-1 hp 52/52 alive 1 mana 159/165 casting 0
+CAST_REQUEST cast-9 -> native HandleCastSpellOpcode(castCount 7, spell 133, target 0xF1300000450002E2) target hp 36/55 caster power 160
+native cast result for cast-9: SPELL_FAILED_OUT_OF_RANGE (rejected)
+state rev 28: player-1 hp 52/52 alive 1 mana 161/165 casting 0
+state rev 29: player-1 hp 52/52 alive 1 mana 162/165 casting 0
+state rev 30: player-1 hp 52/52 alive 1 mana 163/165 casting 0
+state rev 31: player-1 hp 52/52 alive 1 mana 165/165 casting 0
+CAST_REQUEST cast-10 -> native HandleCastSpellOpcode(castCount 8, spell 133, target 0xF1300000450002E2) target hp 36/55 caster power 165
+native Spell::prepare accepted cast-10 (spell 133) [hook thread 42957, world thread 42957]
+state rev 32: player-1 hp 52/52 alive 1 mana 165/165 casting 133
+native Spell::cast executed cast-10 (spell 133); caster power now 157 [hook thread 39316, world thread 42957]
+state rev 33: player-1 hp 52/52 alive 1 mana 157/165 casting 0
+native damage log: spell 133 0x0000000000000001 -> 0xF1300000450002E2 amount 17 school 4 crit false [hook thread 39316]
+state rev 34: target-1 hp 19/55 alive 1 mana 0/0 casting 0
+CAST_REQUEST cast-11 -> native HandleCastSpellOpcode(castCount 9, spell 133, target 0xF1300000450002E2) target hp 19/55 caster power 157
+native Spell::prepare accepted cast-11 (spell 133) [hook thread 42957, world thread 42957]
+state rev 35: player-1 hp 52/52 alive 1 mana 157/165 casting 133
+state rev 36: target-1 hp 18/55 alive 1 mana 0/0 casting 0
+native Spell::cast executed cast-11 (spell 133); caster power now 149 [hook thread 39316, world thread 42957]
+state rev 37: player-1 hp 52/52 alive 1 mana 149/165 casting 0
+native damage log: spell 133 0x0000000000000001 -> 0xF1300000450002E2 amount 20 school 4 crit false [hook thread 39316]
+native death of target-1 (0xF1300000450002E2)
+state rev 38: target-1 hp 0/55 alive 0 mana 0/0 casting 0
+CAST_REQUEST cast-12 -> native HandleCastSpellOpcode(castCount 10, spell 133, target 0xF1300000450002E2) target hp 0/55 caster power 149
+native cast result for cast-12: SPELL_FAILED_BAD_TARGETS (rejected)
+CAST_REQUEST cast-13 -> native HandleCastSpellOpcode(castCount 11, spell 133, target 0xF1300000450002E2) target hp 0/55 caster power 149
+native cast result for cast-13: SPELL_FAILED_BAD_TARGETS (rejected)
+state rev 39: player-1 hp 52/52 alive 1 mana 150/165 casting 0
+state rev 40: player-1 hp 52/52 alive 1 mana 151/165 casting 0
+state rev 41: player-1 hp 52/52 alive 1 mana 152/165 casting 0
+state rev 42: player-1 hp 52/52 alive 1 mana 153/165 casting 0
+state rev 43: player-1 hp 52/52 alive 1 mana 155/165 casting 0
+state rev 44: player-1 hp 52/52 alive 1 mana 156/165 casting 0
+state rev 45: player-1 hp 52/52 alive 1 mana 157/165 casting 0
+state rev 46: player-1 hp 52/52 alive 1 mana 159/165 casting 0
+state rev 47: player-1 hp 52/52 alive 1 mana 160/165 casting 0
+state rev 48: player-1 hp 52/52 alive 1 mana 161/165 casting 0
+state rev 49: player-1 hp 52/52 alive 1 mana 163/165 casting 0
+state rev 50: player-1 hp 52/52 alive 1 mana 164/165 casting 0
+state rev 51: player-1 hp 52/52 alive 1 mana 165/165 casting 0
+CAST_REQUEST cast-14 -> native HandleCastSpellOpcode(castCount 12, spell 133, target 0xF1300000450002E2) target hp 0/55 caster power 165
+native cast result for cast-14: SPELL_FAILED_BAD_TARGETS (rejected)
+CAST_REQUEST cast-15 -> native HandleCastSpellOpcode(castCount 13, spell 133, target 0xF1300000450002E2) target hp 0/55 caster power 165
+native cast result for cast-15: SPELL_FAILED_BAD_TARGETS (rejected)
+fixture target despawned (paused)
+test mode exited (paused)
+fixture creature 0xF1300000450009AC entry 69 'Diseased Timber Wolf' level 2 hp 55/55 at (16225.01, 16271.95, 12.98), 12.6 yd from player
+bound player-1 -> 0x0000000000000001 gen 3 core (16226.20, 16257.00, 13.20) host (2495.00, -1670.00, 13.30)
+bound target-1 -> 0xF1300000450009AC gen 4 core (16225.01, 16271.95, 12.98) host (2481.33, -1671.09, 13.10)
+state rev 52: player-1 hp 52/52 alive 1 mana 165/165 casting 0
+state rev 52: target-1 hp 55/55 alive 1 mana 0/0 casting 0
+CAST_REQUEST cast-19 -> native HandleCastSpellOpcode(castCount 14, spell 133, target 0xF1300000450009AC) target hp 55/55 caster power 165
+native Spell::prepare accepted cast-19 (spell 133) [hook thread 42957, world thread 42957]
+state rev 53: player-1 hp 52/52 alive 1 mana 165/165 casting 133
+host connection closed: peer_closed
+host disconnected (peer_closed): freezing fixture, pending requests invalidated
+fixture target despawned (host_disconnected)
+test mode exited (host_disconnected)
+host accepted, epoch e2-ff0fe642ed96f213 adapter=bridge-cli
+WELCOME sent, epoch e2-ff0fe642ed96f213
+fixture creature 0xF130000045000B82 entry 69 'Diseased Timber Wolf' level 2 hp 55/55 at (16225.01, 16271.95, 12.98), 12.6 yd from player
+bound player-1 -> 0x0000000000000001 gen 5 core (16226.20, 16257.00, 13.20) host (2495.00, -1670.00, 13.30)
+bound target-1 -> 0xF130000045000B82 gen 6 core (16225.01, 16271.95, 12.98) host (2481.33, -1671.09, 13.10)
+state rev 1: player-1 hp 52/52 alive 1 mana 165/165 casting 0
+state rev 1: target-1 hp 55/55 alive 1 mana 0/0 casting 0
+host connection closed: peer_closed
+host disconnected (peer_closed): freezing fixture, pending requests invalidated
+fixture target despawned (host_disconnected)
+test mode exited (host_disconnected)
+logging out headless player Gtabridge (core_shutdown): hp 52/52, saving through native logout

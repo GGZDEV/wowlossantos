@@ -1,0 +1,80 @@
+[worldserver]
+
+###################################################################################################
+# mod-gamebridge (Azeroth Theft Auto) - M1 test bridge
+#
+# Copy to <install>/etc/modules/mod_gamebridge.conf and edit. Keep the token out of git:
+# prefer the environment variable named by GameBridge.TokenEnv.
+###################################################################################################
+
+#    GameBridge.Enable
+#        Description: Start the loopback bridge endpoint and the headless fixture player.
+#        Default:     0
+
+GameBridge.Enable = 0
+
+#    GameBridge.Port
+#        Description: TCP port bound on 127.0.0.1 only.
+#        Default:     17635
+
+GameBridge.Port = 17635
+
+#    GameBridge.Token / GameBridge.TokenEnv
+#        Description: Per-install local secret (>= 16 chars) checked in HELLO. If the
+#                     environment variable named by TokenEnv is set it overrides Token.
+#                     The token is never written to logs.
+
+GameBridge.Token = ""
+GameBridge.TokenEnv = "ATA_BRIDGE_TOKEN"
+
+#    GameBridge.Account / GameBridge.Character
+#        Description: Account and character used by the headless session. The account is
+#                     created with a random unused password when missing (CreateIfMissing).
+
+GameBridge.Account = "GTABRIDGE"
+GameBridge.Character = "Gtabridge"
+
+#    GameBridge.Fixture.*
+#        CreateIfMissing: create account/character through the native paths when missing.
+#        Race/Class/Gender: CMSG_CHAR_CREATE values (1 = Human, 8 = Mage).
+#        Id: fixture identifier the host must send in ENTER_TEST.
+#        CreatureEntry: creature_template entry summoned as the dedicated target (required).
+#        TargetDistance: yards in front of the player.
+#        IsolateEntities: block damage to bridge entities that does not come from the
+#                         bridge player (M1 arena policy; logged).
+
+GameBridge.Fixture.CreateIfMissing = 1
+GameBridge.Fixture.Race = 1
+GameBridge.Fixture.Class = 8
+GameBridge.Fixture.Gender = 0
+GameBridge.Fixture.Id = "m1-arena"
+GameBridge.Fixture.CreatureEntry = 0
+GameBridge.Fixture.TargetDistance = 15
+GameBridge.Fixture.IsolateEntities = 1
+
+#    GameBridge.SpellIds
+#        Description: Space separated whitelist of spell ids accepted in CAST_REQUEST.
+#                     The spell must also be learned/active (native spellbook check).
+
+GameBridge.SpellIds = ""
+
+#    GameBridge.Arena.*
+#        Map: core map id of the proxy arena.
+#        CoreOrigin: "x y z o" arena anchor on that map (open, flat, verified terrain).
+#        Radius: yards around CoreOrigin accepted for projected positions.
+#        MaxSpeed: yards/second; faster jumps invalidate the binding (teleport/loading).
+
+GameBridge.Arena.Map = 1
+GameBridge.Arena.CoreOrigin = ""
+GameBridge.Arena.Radius = 40
+GameBridge.Arena.MaxSpeed = 20
+
+#    GameBridge.Projection.*
+#        p_core = CoreOrigin + Scale * R(Yaw) * (p_gta - GtaOrigin)
+#        GtaOrigin: "x y z" GTA world position mapped onto CoreOrigin.
+#        Scale: core yards per GTA unit (GTA unit ~ 1 m -> 1.0936). Calibrate in game.
+#        YawDegrees: GTA (+x east, +y north) -> core (+x north, +y west) is -90.
+
+GameBridge.Projection.GtaOrigin = "0 0 0"
+GameBridge.Projection.Scale = 1.0936133
+GameBridge.Projection.YawDegrees = -90

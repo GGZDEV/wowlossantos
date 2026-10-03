@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:azeroth-theft-auto:envelope:v1",
+  "title": "GameBridge v1 initial envelope",
+  "description": "Envelope only. Typed payload schemas and semantic validation must be implemented before runtime acceptance.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "type",
+    "epoch",
+    "seq",
+    "request_id",
+    "payload"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "type": {
+      "enum": [
+        "HELLO",
+        "WELCOME",
+        "ENTER_TEST",
+        "ENTITY_BIND",
+        "HOST_BIND_ACK",
+        "POSITION",
+        "CAST_REQUEST",
+        "CAST_STATUS",
+        "STATE_SNAPSHOT",
+        "COMBAT_EVENT",
+        "HOST_ENTITY_LOST",
+        "ENTITY_DESPAWN",
+        "SET_PAUSED",
+        "PAUSE_ACK",
+        "RESYNC",
+        "RESET",
+        "PING",
+        "PONG",
+        "ERROR"
+      ]
+    },
+    "epoch": {
+      "type": "string",
+      "maxLength": 128
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "request_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 128
+    },
+    "payload": {
+      "type": "object"
+    }
+  }
+}

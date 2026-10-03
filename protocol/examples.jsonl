@@ -1,0 +1,5 @@
+{"version": 1, "type": "HELLO", "epoch": "", "seq": 0, "request_id": null, "payload": {"adapter": "gta-sa", "version": 1, "token": "EXAMPLE_ONLY"}}
+{"version": 1, "type": "WELCOME", "epoch": "example-epoch", "seq": 1, "request_id": null, "payload": {"core_sha": "EXAMPLE_NOT_A_PIN", "capabilities": ["native_cast", "state_snapshot"], "character_id": "configured-character"}}
+{"version": 1, "type": "CAST_REQUEST", "epoch": "example-epoch", "seq": 1, "request_id": "cast-1", "payload": {"caster_id": "player-1", "target_id": "target-1", "spell_id": 1, "host_generation": 1}}
+{"version": 1, "type": "CAST_STATUS", "epoch": "example-epoch", "seq": 2, "request_id": "cast-1", "payload": {"status": "accepted", "reason": null, "spell_id": 1}}
+{"version": 1, "type": "STATE_SNAPSHOT", "epoch": "example-epoch", "seq": 3, "request_id": null, "payload": {"full": false, "revision": 2, "entities": [{"entity_id": "target-1", "generation": 1, "revision": 2, "hp": 447, "max_hp": 500, "alive": true}]}}
